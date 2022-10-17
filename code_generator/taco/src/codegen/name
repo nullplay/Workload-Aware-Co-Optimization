@@ -1,0 +1,42 @@
+codegen_c.cpp:    out << "#ifndef TACO_GENERATED_" << func->name << "\n";
+codegen_c.cpp:    out << "#define TACO_GENERATED_" << func->name << "\n";
+codegen_c.cpp:  funcName = func->name;
+codegen_c.cpp:  FindVars inputVarFinder(func->inputs, {}, this);
+codegen_c.cpp:  func->body.accept(&inputVarFinder);
+codegen_c.cpp:  FindVars outputVarFinder({}, func->outputs, this);
+codegen_c.cpp:  func->body.accept(&outputVarFinder);
+codegen_c.cpp:  FindVars varFinder(func->inputs, func->outputs, this);
+codegen_c.cpp:  func->body.accept(&varFinder);
+codegen_c.cpp:  out << printDecls(varFinder.varDecls, func->inputs, func->outputs) << endl;
+codegen_c.cpp:    out << printContextDeclAndInit(varMap, localVars, numYields, func->name)
+codegen_c.cpp:  print(func->body);
+codegen_c.cpp:    out << endl << printPack(varFinder.outputProperties, func->outputs);
+codegen.cpp:  func->accept(&checker);
+codegen.cpp:  ret << "int " << func->name << "(";
+codegen.cpp:  const auto returnType = func->getReturnType();
+codegen.cpp:  for (size_t i=0; i<func->outputs.size(); i++) {
+codegen.cpp:    auto var = func->outputs[i].as<Var>();
+codegen.cpp:    taco_iassert(var) << "Unable to convert output " << func->outputs[i]
+codegen.cpp:  for (size_t i=0; i<func->inputs.size(); i++) {
+codegen.cpp:    auto var = func->inputs[i].as<Var>();
+codegen.cpp:    taco_iassert(var) << "Unable to convert output " << func->inputs[i]
+codegen.cpp:  //if (func->name == "compute") {
+codegen.cpp:  //  for (size_t i=0; i<func->outputs.size(); i++) {
+codegen.cpp:  //    auto var = func->outputs[i].as<Var>();
+codegen.cpp:  //  for (size_t i=0; i<func->inputs.size(); i++) {
+codegen.cpp:  //    auto var = func->inputs[i].as<Var>();
+codegen_cuda.cpp:        Stmt body = ir::simplify(func->body);
+codegen_cuda.cpp:        stmt = Function::make(func->name, func->outputs, func->inputs, body);
+codegen_cuda.cpp:  DeviceFunctionCollector deviceFunctionCollector(func->inputs, func->outputs, this);
+codegen_cuda.cpp:  func->body.accept(&deviceFunctionCollector);
+codegen_cuda.cpp:      out << endl << printPack(varFinder.outputProperties, func->outputs);
+codegen_cuda.cpp:  funcName = func->name;
+codegen_cuda.cpp:    out << "#ifndef TACO_GENERATED_" << func->name << "\n";
+codegen_cuda.cpp:    out << "#define TACO_GENERATED_" << func->name << "\n";
+codegen_cuda.cpp:  FindVars varFinder(func->inputs, func->outputs, this, true);
+codegen_cuda.cpp:  func->body.accept(&varFinder);
+codegen_cuda.cpp:  out << printDecls(varFinder.varDecls, func->inputs, func->outputs) << endl;
+codegen_cuda.cpp:    out << printContextDeclAndInit(varMap, localVars, numYields, func->name)
+codegen_cuda.cpp:  print(func->body);
+codegen_cuda.cpp:    out << endl << printPack(varFinder.outputProperties, func->outputs);
+codegen_cuda.cpp:  if (GEN_TIMING_CODE && emittedTimerStartCode && func->name.rfind("compute", 0) == 0) {
