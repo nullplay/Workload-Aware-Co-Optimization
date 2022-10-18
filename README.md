@@ -6,7 +6,7 @@ This repository includes an artifact for "WACO: Learning workload-aware co-optim
 ## Requirement
 You can compile a generated code from TACO with `gcc` with OpenMP but we ***highly recommend*** to use Intel C++ Compiler Classic (`icc`, `icpc`) to compile a generated kernel from TACO for better performance.
 
-You can download from https://www.intel.com/content/www/us/en/developer/tools/oneapi/dpc-compiler.html#gs.fyw7ne . It is important to install **Intel C++ Compiler Classic (`icc` and `icpc`)**, not OneAPI compiler.
+You can download from https://www.intel.com/content/www/us/en/developer/tools/oneapi/dpc-compiler.html#gs.fyw7ne . It is important to install **Intel C++ Compiler Classic (`icc` and `icpc`)**, not an OneAPI compiler.
 
 ## Installation
 #### 0. clone the repo and set `WACO_HOME` as working directory.
@@ -15,7 +15,7 @@ git clone https://github.com/nullplay/Workload-Aware-Co-Optimization.git
 cd Workload-Aware-Co-Optimization
 export WACO_HOME=`pwd`
 ```  
-#### 1. If you want to train the cost model from scratch or use the pre-trained model, you need a system that has a GPU with [PyTorch](https://pytorch.org/get-started/locally/) and [MinkowskiEngine](https://github.com/NVIDIA/MinkowskiEngine) installed.
+#### 1. If you want to train the cost model from scratch or use the [pre-trained](https://github.com/nullplay/Workload-Aware-Co-Optimization/edit/main/README.md#pretrained-model) model, you need a system that has a GPU with [PyTorch](https://pytorch.org/get-started/locally/) and [MinkowskiEngine](https://github.com/NVIDIA/MinkowskiEngine) installed.
 
 - Please follow the instructions in https://github.com/NVIDIA/MinkowskiEngine#requirements to install dependencies needed.  
 #### 2. Install hnswlib with a Python binding
@@ -88,10 +88,66 @@ Note that all the sparse matrices are stored in `$WACO_HOME/dataset`
 **4. Test performances of SuperSchedules found by WACO.**
 ```
 cd $WACO_HOME/code_generator
-./spmm ../dataset/"YourSparseMatrixName".csr $WACO_HOME/WACO/SpMM/topk/"YourSparseMatrixName".csr
-(Example) ./spmm ../dataset/bcsstk38.csr $WACO_HOME/WACO/SpMM/topk/bcsstk38.csr
+./spmm ../dataset/"YourSparseMatrixName".csr $WACO_HOME/WACO/SpMM/topk/"YourSparseMatrixName".txt
+(Example) ./spmm ../dataset/bcsstk38.csr $WACO_HOME/WACO/SpMM/topk/bcsstk38.txt
 ```
 
-WACO's cost model is somehow architecture-dependent. You may not observe a speedup over FixedCSR due to a lack of training dataset, using a cost model trained on different architecture, etc.
+## Pretrained model
+Collecting runtimes and training a cost model need a lot of time (approximately 1-2 weeks). For a quick evaluation, we provide pre-trained cost models which are trained on ***Intel(R) Xeon(R) CPU E5-2680 v3 with an icc-compiled*** TACO kernel. 
 
-Top-20 Schedules, Collected Runtimes, built KNNGraphs, and pre-trained cost models that we've used in the paper can be found at : https://www.dropbox.com/s/hrxz5j1h5dhgiec/pretrained.zip?dl=0 
+Top-20 Schedules, collected Runtimes, built KNNGraphs, and pre-trained cost models that we've used in the paper can be found at : 
+https://www.dropbox.com/s/mos4jtma4jmqkje/pretrained.zip?dl=0
+
+
+```
+pretrained
+├── SDDMM
+│   ├── TrainingData
+│   │   ├── CollectedData  [19262 entries]
+│   │   ├── test.txt
+│   │   ├── total.txt
+│   │   ├── train.txt
+│   │   └── validation.txt
+│   ├── hnsw_schedule.bin
+│   ├── resnet.pth
+│   └── topk  [975 entries]
+├── SpMM
+│   ├── TrainingData
+│   │   ├── CollectedData  [21481 entries]
+│   │   ├── test.txt
+│   │   ├── total.txt
+│   │   ├── train.txt
+│   │   └── validation.txt
+│   ├── hnsw_schedule.bin
+│   ├── resnet.pth
+│   └── topk  [975 entries]
+├── SpMV
+│   ├── TrainingData
+│   │   ├── CollectedData  [21481 entries]
+│   │   ├── test.txt
+│   │   ├── total.txt
+│   │   ├── train.txt
+│   │   └── validation.txt
+│   ├── hnsw_schedule.bin
+│   ├── resnet.pth
+│   └── topk  [975 entries]
+└── dataset  [975 entries]
+```
+
+`dataset` directory includes 975 sparse matrices from [SuiteSparse Matrix Collection](https://sparse.tamu.edu/) in which a file format are converted into our custom .csr format. 
+
+To test a pretrained cost model for SpMM,
+```
+cp -r pretrained/SpMM/* $WACO_HOME/WACO/SpMM/
+cp -r pretrained/dataset/* $WACO_HOME/dataset/
+cd $WACO_HOME/code_generator
+./spmm ../dataset/"YourSparseMatrixName".csr $WACO_HOME/WACO/SpMM/topk/"YourSparseMatrixName".txt
+(Example) ./spmm ../dataset/bcsstk38.csr $WACO_HOME/WACO/SpMM/topk/bcsstk38.txt
+```
+
+To test a pretrained cost model for all 975 test matrices,
+```
+while read mtx; do echo $mtx &&  ./spmm ../dataset/$mtx.csr $WACO_HOME/WACO/SpMM/topk/$mtx.txt ; done < $WACO_HOME/WACO/SpMM/TrainingData/test.txt
+```
+
+Note that WACO's cost model predicts a runtime of a sparse tensor program assuming running on a specific architecture. Therefore, you may not observe a speedup if the characteristic of your system is significantly different from the system that a pretrained model assumes.
