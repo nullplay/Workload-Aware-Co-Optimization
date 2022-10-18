@@ -31,7 +31,7 @@ if __name__ == "__main__":
     SparseMatrix_Dataset_Valid = SparseMatrixDataset('./TrainingData/validation.txt')
     valid_SparseMatrix = torch.utils.data.DataLoader(SparseMatrix_Dataset_Valid, batch_size=1, shuffle=True, num_workers=0, collate_fn=collate_fn)
 
-    for epoch in range(2000) :
+    for epoch in range(80) :
       # Train
       net.train()
       train_loss = 0
