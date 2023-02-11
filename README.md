@@ -1,7 +1,7 @@
 # WACO
 Workload-Aware Co-Optimization for a sparse tensor program.
 
-This repository includes an artifact for "WACO: Learning workload-aware co-optimization of the format and schedule of a sparse tensor program" which will appear in ASPLOS 2023. 
+This repository includes an artifact for ["WACO: Learning workload-aware co-optimization of the format and schedule of a sparse tensor program"](https://dl.acm.org/doi/10.1145/3575693.3575742)
 
 ## Requirement
 You can compile a generated code from TACO with `gcc` with OpenMP but we ***highly recommend*** to use Intel C++ Compiler Classic (`icc`, `icpc`) to compile a generated kernel from TACO for better performance.
